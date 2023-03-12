@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+data:
+  config.yml: |-
+    global:
+      resolve_timeout: 5m
+    
+    route:
+      group_by: ['alertname']
+      receiver: gmail-notifications
+      group_interval: 30s
+      repeat_interval: 30s
+
+    receivers:
+      - name: 'gmail-notifications'
+        email_configs:
+        - to: tdashpute@gmail.com
+          from: tdashpute@gmail.com
+          smarthost: smtp.gmail.com:587
+          auth_username: "tdashpute@gmail.com"
+          auth_identity: "tdashpute@gmail.com"
+          auth_password: "password"
+          send_resolved: true

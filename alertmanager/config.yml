@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+data:
+  config.yml: |-
+    global:
+      resolve_timeout: 1m
+      slack_api_url: "https://hooks.slack.com/services/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"
+ 
+    route:
+      receiver: "slack-notifications"
+
+    receivers:
+      - name: "slack-notifications"
+        slack_configs:
+        - channel: "#prom-alerts-slack"
+          send_resolved: true
