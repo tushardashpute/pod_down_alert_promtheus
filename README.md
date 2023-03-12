@@ -38,43 +38,27 @@
     kubectl apply -f prometheus
 # Note:
   Here I kept three rules: (we can get alaram)
-  3. Messages in Queue if goes beyond 10
+  1. KubernetesPodNotHealthy
   2. CPU Utilization High for Nodes
   3. Pod status Pending/Unknown
 
-# Alarm1: Create a new Queue TestQueue and post more than 12 messages, will get alarm
+# Alarm1: Create a deployment with wrong image, so that pod will goto ErrImagePull state and alert will be thrown
 
-Now login to RMQ UI and create testQueue
+        kubectl apply -f  nginx-deployment.yml
 
-kubectl get svc mu-rabbit-rabbitmq -n rabbit --> Now grab the ALB url and login 
+        $ kubectl get pods -l app=nginx
+        NAME                                READY   STATUS             RESTARTS   AGE
+        nginx-deployment-698b456684-kdfqn   0/1     ImagePullBackOff   0          45m
+        nginx-deployment-698b456684-sqjlp   0/1     ImagePullBackOff   0          45m
+        nginx-deployment-698b456684-wvjjt   0/1     ImagePullBackOff   0          45m
 
-http://url:15672
+Now in the prometheus alert
 
-User : user
-echo "Password      : $(kubectl get secret --namespace rabbit mu-rabbit-rabbitmq -o jsonpath="{.data.rabbitmq-password}" | base64 --decode)"
-echo "ErLang Cookie : $(kubectl get secret --namespace rabbit mu-rabbit-rabbitmq -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 --decode)"
+![image](https://user-images.githubusercontent.com/74225291/224524435-49a06316-f7c2-4307-bf16-d92a7a4dc30a.png)
 
-Create Exchange 
-
-![image](https://user-images.githubusercontent.com/74225291/145673483-94ba9293-2484-41ac-a54c-d35f04691830.png)
-
-Then create Queue
-
-![image](https://user-images.githubusercontent.com/74225291/145673641-717dd050-a358-49ff-b555-17b287a23dab.png)
-
-Now bind the Exchange with Queue.
-
-Exchange --> TestExchange --> Add Binding 
-
-![image](https://user-images.githubusercontent.com/74225291/145673712-ff9d27c8-135e-4012-a362-32bb16ed515f.png)
-
-Now post 10+messages to Queue, after one minutes alert with be in Firing state from Active state.
-
-![image](https://user-images.githubusercontent.com/74225291/145672055-71d27167-8319-4ca9-bfce-e99d08148faa.png)
 
 Now you will see alert notification in Slack as well.
 
+![image](https://user-images.githubusercontent.com/74225291/224524403-e6b55e7c-7dc6-4fee-a58f-8c886e305db1.png)
+
 # Alaram2: Connect to node and try to increase CPU Utilization, will get Alaram
-# Alaram3: Deploy nginx
-  kubectl apply -f nginx-deployment.yml
-  Nginx Pod status will be under pending state, So will get Alaram
