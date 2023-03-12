@@ -15,6 +15,10 @@
     kubectl apply -f kube-state-metrics
 # Deploy alertmanager
 
+Steps to configure slack:
+
+https://ivanahuckova.medium.com/step-by-step-guide-to-setting-up-prometheus-alertmanager-with-slack-pagerduty-and-gmail-75069a8905b7
+
     Edit the config.yml and update the slack web hook in it with your slack web hook.
     
     "https://api.slack.com/messaging/webhooks" --> How to create Slack app and get web hook URL
