@@ -1,4 +1,4 @@
-# prometheus-alertmanager-slack-RMQ-kubernetes
+# prometheus-alertmanager-slack-kubernetes
 
 # Pre-Requisites:
     EKS-Cluster
@@ -8,18 +8,6 @@
     ./get_helm.sh
     cp /usr/local/bin/helm /usr/bin
     which helm
-# Deploy RMQ on EKS
-    helm repo add stable https://charts.helm.sh/stable
-    kubectl create namespace rabbit
-    helm install mu-rabbit stable/rabbitmq --namespace rabbit
-    
-    Now login to RMQ pod and enable rabbitmq_management plugin, which will expose RabbitMQ metrics to /metrics endpoint.
-    
-    rabbitmq-plugins enable rabbitmq_management
-    
-    kubectl exec mu-rabbit-rabbitmq-0 -n rabbit -- rabbitmq-plugins enable rabbitmq_prometheus
-    
-    kubectl exec mu-rabbit-rabbitmq-0 -n rabbit -- curl -v -H "Accept:text/plain" "http://localhost:15692/metrics"
     
 # Deploy Node Exporter 
     kubectl apply -f node-exporter
@@ -40,7 +28,6 @@
   Here I kept three rules: (we can get alaram)
   1. KubernetesPodNotHealthy
   2. CPU Utilization High for Nodes
-  3. Pod status Pending/Unknown
 
 # Alarm1: Create a deployment with wrong image, so that pod will goto ErrImagePull state and alert will be thrown
 
@@ -52,7 +39,9 @@
         nginx-deployment-698b456684-sqjlp   0/1     ImagePullBackOff   0          45m
         nginx-deployment-698b456684-wvjjt   0/1     ImagePullBackOff   0          45m
 
-Now in the prometheus alert
+Now in the prometheus alert, you can see alert is in firing mode
+
+kubectl port-forward svc/prometheus-service   9090:9090 &
 
 ![image](https://user-images.githubusercontent.com/74225291/224524435-49a06316-f7c2-4307-bf16-d92a7a4dc30a.png)
 
